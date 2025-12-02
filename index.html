@@ -3,72 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telemetría V7 - Control Manual de Filtros</title>
+    <title>Telemetría RED (Firebase)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        :root {
-            --primary: #003049;
-            --secondary: #669bbc;
-            --accent: #c1121f;
-            --bg: #fdf0d5;
-            --white: #ffffff;
-            --demo-color: #ffb703;
-        }
-
+        :root { --primary: #003049; --secondary: #669bbc; --accent: #c1121f; --bg: #fdf0d5; --white: #ffffff; --demo-color: #ffb703; }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; color: #333; }
-        
-        /* PANTALLAS (LOGIN vs APP) */
         .screen { display: none; padding: 20px; }
         .active-screen { display: block; }
-
-        /* LOGIN STYLES */
-        .login-container { 
-            max-width: 400px; margin: 50px auto; background: white; padding: 40px; 
-            border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; 
-        }
-        .login-btn { width: 100%; margin-top: 10px; padding: 12px; font-size: 1rem; cursor: pointer; border: none; border-radius: 5px; }
-        .demo-btn { background-color: var(--demo-color); color: #000; margin-top: 20px; font-weight: bold; }
+        
+        /* LOGIN */
+        .login-container { max-width: 400px; margin: 50px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        .login-btn { width: 100%; margin-top: 10px; padding: 12px; border-radius: 5px; border: none; cursor: pointer; font-size: 1rem; }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-demo { background: var(--demo-color); color: black; font-weight: bold; margin-top: 20px; }
         .supervisor-link { display: block; margin-top: 20px; color: #666; font-size: 0.9rem; text-decoration: underline; cursor: pointer; }
 
-        /* APP STYLES */
+        /* APP */
         .container { max-width: 1200px; margin: 0 auto; background: var(--white); padding: 25px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        
         header { border-bottom: 3px solid var(--primary); margin-bottom: 20px; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .user-badge { background: var(--primary); color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
-        .logout-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.9rem; text-decoration: underline; margin-left: 10px; }
-
-        /* DEMO MODE */
+        
+        /* DEMO */
         body.demo-mode { border: 10px solid var(--demo-color); }
         .demo-banner { background: var(--demo-color); color: black; text-align: center; font-weight: bold; padding: 10px; display: none; }
         body.demo-mode .demo-banner { display: block; }
 
-        /* FORMULARIOS */
+        /* FORMS & TABLES */
         .form-section { background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 25px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         .form-group { display: flex; flex-direction: column; }
         label { font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; color: var(--primary); }
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-
-        /* ACCIONES */
+        
         .action-details { background: #e9ecef; padding: 15px; border-radius: 5px; margin-top: 10px; display: none; border-left: 5px solid var(--accent); }
         .buttons-row { margin-top: 20px; display: flex; justify-content: space-between; }
-        .btn-save { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        .btn-pdf { background: var(--secondary); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-
-        /* NUEVO: PANEL DE FILTROS V7 */
+        
+        /* FILTROS */
         .filter-panel { background: #eef4f8; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #dae1e7; }
-        .filter-header { font-size: 0.9rem; font-weight: bold; color: var(--primary); margin-bottom: 10px; display: block; }
         .filter-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
         .filter-item { flex-grow: 1; }
-        
-        /* BOTONES DE FILTRO */
         .btn-search { background: var(--primary); color: white; border: none; padding: 0 20px; border-radius: 4px; cursor: pointer; height: 38px; font-weight: bold; }
-        .btn-search:hover { background: #004e6e; }
         .btn-clear { background: #6c757d; color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer; height: 38px; }
 
-        /* TABLA */
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 20px; }
         thead { background: var(--primary); color: white; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
@@ -76,61 +54,66 @@
         .bg-alert { background: #ffe5e5; color: #c1121f; }
         .bg-warn { background: #fff3cd; color: #856404; }
         .bg-ok { background: #d4edda; color: #155724; }
-
+        
         /* ADMIN PANEL */
         .admin-panel { display: none; border: 2px solid var(--primary); padding: 20px; margin-top: 20px; background: #eef4f8; }
-        .active { display: block; }
         .user-list li { padding: 5px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; }
+        
+        /* Loader */
+        #loader { display: none; color: var(--primary); font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div id="login-screen" class="screen active-screen">
     <div class="login-container">
-        <h2 style="color: var(--primary);">Acceso Telemetría</h2>
+        <h2 style="color: var(--primary);">Telemetría RED</h2>
+        <p style="font-size:0.8rem; color:#666;">Conectado a Base de Datos Central</p>
+        
+        <div id="loader">Conectando con la nube...</div>
+
         <div id="login-form-box">
             <div class="form-group" style="text-align: left;">
-                <label>Seleccione Usuario:</label>
-                <select id="loginUserSelect"><option value="">Cargando...</option></select>
+                <label>Usuario:</label>
+                <select id="loginUserSelect"><option value="">Cargando usuarios...</option></select>
             </div>
             <div class="form-group" style="text-align: left; margin-top: 15px;">
                 <label>Contraseña:</label>
-                <input type="password" id="loginPass" placeholder="Ingrese su clave">
+                <input type="password" id="loginPass" placeholder="Su clave">
             </div>
-            <button class="login-btn btn-save" onclick="attemptLogin()">Iniciar Turno</button>
+            <button class="login-btn btn-main" id="btnLogin">Iniciar Turno</button>
         </div>
 
-        <button class="login-btn demo-btn" onclick="startDemoMode()">🎓 MODO APRENDIZAJE (DEMO)</button>
+        <button class="login-btn btn-demo" id="btnDemo">🎓 MODO APRENDIZAJE (DEMO)</button>
         
         <div id="supervisor-setup" style="display:none; margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">
-            <h3 style="color:red;">⚠️ Configuración Inicial</h3>
-            <p>Registre al primer Supervisor para comenzar.</p>
-            <button class="login-btn btn-save" onclick="showRegisterModal('supervisor')">Crear Supervisor</button>
+            <h3 style="color:red;">⚠️ Primer Uso</h3>
+            <p>Registre al Supervisor Maestro.</p>
+            <button class="login-btn btn-main" onclick="window.showRegisterModal('supervisor')">Crear Supervisor</button>
         </div>
-        <a class="supervisor-link" onclick="toggleSupervisorLogin()">Soy Supervisor (Gestión)</a>
+        <a class="supervisor-link" onclick="window.toggleSupervisorLogin()">Soy Supervisor</a>
     </div>
 </div>
 
 <div id="app-screen" class="screen">
-    <div class="demo-banner">🎓 MODO DEMO - DATOS NO SE GUARDAN</div>
-    
+    <div class="demo-banner">🎓 MODO DEMO - DATOS LOCALES Y TEMPORALES</div>
     <div class="container">
         <header>
             <div>
                 <h1>Control Telemétrico UCO/UTI</h1>
-                <p>Monitor de Ritmo y Frecuencia</p>
+                <p>Sistema Online Multi-usuario</p>
             </div>
             <div class="user-status">
                 <div>Usuario: <span id="displayUser" class="user-badge">Invitado</span></div>
-                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
-                <button id="admin-btn" class="logout-btn" style="color: var(--primary); display:none;" onclick="toggleAdminPanel()">⚙ Usuarios</button>
+                <button class="logout-btn" onclick="location.reload()">Salir</button>
+                <button id="admin-btn" class="logout-btn" style="color: var(--primary); display:none;" onclick="window.toggleAdminPanel()">⚙ Gestionar</button>
             </div>
         </header>
 
         <div id="adminPanel" class="admin-panel">
-            <h3>⚙ Panel de Supervisor</h3>
-            <button class="btn-save" onclick="showRegisterModal('tecnico')">+ Registrar Nuevo Técnico</button>
-            <h4>Personal Registrado:</h4>
+            <h3>⚙ Panel de Supervisor (Online)</h3>
+            <button class="btn-main" style="padding:5px 10px;" onclick="window.showRegisterModal('tecnico')">+ Registrar Nuevo Técnico</button>
+            <h4>Usuarios en Base de Datos:</h4>
             <ul id="userListDisplay" class="user-list"></ul>
         </div>
 
@@ -138,7 +121,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Paciente</label>
-                    <input list="patientList" id="patientName" placeholder="Buscar o crear..." required autocomplete="off">
+                    <input list="patientList" id="patientName" placeholder="Buscar..." required autocomplete="off">
                     <datalist id="patientList"></datalist>
                 </div>
                 <div class="form-group">
@@ -147,10 +130,10 @@
                 </div>
                 <div class="form-group">
                     <label>FC (LPM)</label>
-                    <input type="number" id="heartRate" placeholder="Ej. 80" min="0" max="300" required>
+                    <input type="number" id="heartRate" placeholder="80" required>
                 </div>
                 <div class="form-group">
-                    <label>Ritmo Cardíaco</label>
+                    <label>Ritmo</label>
                     <select id="rhythm" required>
                         <option value="" disabled selected>Seleccione...</option>
                         <option value="Sinusal">Ritmo Sinusal</option>
@@ -168,8 +151,8 @@
                     <input type="text" id="diagnosis" required>
                 </div>
                 <div class="form-group">
-                    <label>Acción Tomada</label>
-                    <select id="actionType" onchange="toggleActionFields()" required>
+                    <label>Acción</label>
+                    <select id="actionType" onchange="window.toggleActionFields()" required>
                         <option value="Sin Acción">Sin particularidades</option>
                         <option value="Aviso Médico">Se avisa a médico</option>
                         <option value="Código Rojo">CÓDIGO ROJO</option>
@@ -180,201 +163,96 @@
             <div id="doctorField" class="action-details">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Médico Notificado (Autocompletar):</label>
-                        <input type="text" id="doctorName" list="doctorList" placeholder="Dr/Dra...">
+                        <label>Médico (Auto):</label>
+                        <input type="text" id="doctorName" list="doctorList" placeholder="Dr...">
                         <datalist id="doctorList"></datalist>
                     </div>
-                    <div class="form-group">
-                        <label>Hora:</label>
-                        <input type="text" id="actionTimeInfo" readonly style="background: #ccc;">
-                    </div>
+                    <div class="form-group"><label>Hora:</label><input type="text" id="actionTimeInfo" readonly></div>
                 </div>
             </div>
 
             <div class="buttons-row">
-                <button type="button" class="btn-pdf" onclick="generatePDF()">📄 Exportar PDF (Filtrado)</button>
-                <button type="submit" class="btn-save">Registrar Valoración</button>
+                <button type="button" class="btn-clear" style="background:var(--secondary);" onclick="window.generatePDF()">📄 PDF Reporte</button>
+                <button type="submit" class="btn-main" style="padding:10px 20px;">Guardar Registro</button>
             </div>
         </form>
 
         <div class="filter-panel">
-            <span class="filter-header">🔍 Búsqueda Histórica y Filtros</span>
+            <span class="filter-header">🔍 Búsqueda en Base de Datos</span>
             <div class="filter-row">
-                <div class="filter-item">
-                    <label style="font-size:0.8rem">Paciente (Nombre):</label>
-                    <input type="text" id="searchName" placeholder="Escriba..." onkeyup="applyFilters()">
-                </div>
-                <div class="filter-item">
-                    <label style="font-size:0.8rem">Fecha:</label>
-                    <input type="date" id="searchDate">
-                </div>
-                <div class="filter-item">
-                    <label style="font-size:0.8rem">Hora Desde:</label>
-                    <input type="time" id="searchTimeStart">
-                </div>
-                <div class="filter-item">
-                    <label style="font-size:0.8rem">Hora Hasta:</label>
-                    <input type="time" id="searchTimeEnd">
-                </div>
-                
-                <button type="button" class="btn-search" onclick="applyFilters()">🔎 Buscar / Aplicar</button>
-                <button type="button" class="btn-clear" onclick="clearFilters()">Limpiar</button>
+                <div class="filter-item"><label>Paciente:</label><input type="text" id="searchName" placeholder="Nombre..."></div>
+                <div class="filter-item"><label>Fecha:</label><input type="date" id="searchDate"></div>
+                <div class="filter-item"><label>Desde:</label><input type="time" id="searchTimeStart"></div>
+                <div class="filter-item"><label>Hasta:</label><input type="time" id="searchTimeEnd"></div>
+                <button type="button" class="btn-search" onclick="window.applyFilters()">🔎 Buscar</button>
+                <button type="button" class="btn-clear" onclick="window.clearFilters()">Limpiar</button>
             </div>
         </div>
 
         <table id="dataTable">
             <thead>
-                <tr>
-                    <th>Fecha/Hora</th>
-                    <th>Técnico</th>
-                    <th>Paciente</th>
-                    <th>FC</th>
-                    <th>Ritmo</th>
-                    <th>Acción</th>
-                </tr>
+                <tr><th>Hora</th><th>Técnico</th><th>Paciente</th><th>FC</th><th>Ritmo</th><th>Acción</th></tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
 </div>
 
-<dialog id="registerModal" style="border:1px solid #aaa; border-radius:8px; padding:20px; top:20%;">
+<dialog id="registerModal" style="border:1px solid #aaa; padding:20px; top:20%; border-radius:8px;">
     <h3 id="modalTitle">Nuevo Usuario</h3>
-    <div class="form-group">
-        <label>Nombre:</label>
-        <input type="text" id="newUserName">
-    </div>
-    <div class="form-group" style="margin-top:10px;">
-        <label>Contraseña:</label>
-        <small>Min 6 chars, 1 Mayúscula, 1 Número</small>
-        <input type="password" id="newUserPass1">
-    </div>
-    <div class="form-group">
-        <label>Repetir Contraseña:</label>
-        <input type="password" id="newUserPass2">
-    </div>
+    <input type="text" id="newUserName" placeholder="Nombre" style="width:100%; margin-bottom:10px; padding:5px;">
+    <input type="password" id="newUserPass1" placeholder="Contraseña (Min 6, 1May, 1Num)" style="width:100%; margin-bottom:10px; padding:5px;">
+    <input type="password" id="newUserPass2" placeholder="Repetir Contraseña" style="width:100%; padding:5px;">
     <div style="margin-top:20px; text-align:right;">
         <button onclick="document.getElementById('registerModal').close()">Cancelar</button>
-        <button class="btn-save" onclick="completeRegistration()">Registrar</button>
+        <button class="btn-main" onclick="window.completeRegistration()" style="padding:5px 10px;">Registrar</button>
     </div>
 </dialog>
 
-<script>
-    // --- VARIABLES Y CONFIG ---
-    let CURRENT_USER = null;
+<script type="module">
+    // --- 1. IMPORTACIONES FIREBASE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, get, child, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    // --- 2. CONFIGURACIÓN (¡PEGAR TUS CLAVES AQUÍ!) ---
+    const firebaseConfig = {
+        //  <--- BORRA ESTO Y PEGA LO QUE TE DIO FIREBASE --->
+       
+apiKey: "AIzaSyBzqpiHfCQxQ1RzvsEYsM8yXaxKYQArzvo",
+  authDomain: "telemetria-uco-ha.firebaseapp.com",
+  databaseURL: "https://telemetria-uco-ha-default-rtdb.firebaseio.com",
+  projectId: "telemetria-uco-ha",
+  storageBucket: "telemetria-uco-ha.firebasestorage.app",
+  messagingSenderId: "93946559872",
+  appId: "1:93946559872:web:c0227d133f5c806057d565",
+  measurementId: "G-YG8XMPPJ5H"
+    };
+
+    // --- 3. INICIALIZAR APP ---
+    let app, db;
     let IS_DEMO = false;
+    let LOCAL_RECORDS_CACHE = []; // Para guardar datos traidos de FB y filtrar rapido
+    let CURRENT_USER = null;
     let REGISTER_ROLE = 'tecnico';
 
-    document.addEventListener('DOMContentLoaded', () => {
-        checkSystemStatus();
-        updateTime();
-        setInterval(updateTime, 1000);
-    });
-
-    // --- LOGIN SYSTEM ---
-    function checkSystemStatus() {
-        const users = JSON.parse(localStorage.getItem('appUsers')) || [];
-        if (!users.some(u => u.role === 'supervisor')) {
-            document.getElementById('login-form-box').style.display = 'none';
-            document.getElementById('supervisor-setup').style.display = 'block';
-        } else {
-            document.getElementById('login-form-box').style.display = 'block';
-            document.getElementById('supervisor-setup').style.display = 'none';
-            loadUserDropdown();
-        }
+    // Manejo de error si no configuran las claves
+    try {
+        app = initializeApp(firebaseConfig);
+        db = getDatabase(app);
+        console.log("Firebase Conectado");
+    } catch (e) {
+        console.warn("Falta configuración Firebase. Solo funcionará Demo.");
     }
 
-    function loadUserDropdown() {
-        const select = document.getElementById('loginUserSelect');
-        const users = JSON.parse(localStorage.getItem('appUsers')) || [];
-        select.innerHTML = '<option value="">Seleccione...</option>';
-        users.forEach(u => {
-            let option = document.createElement('option');
-            option.value = u.username;
-            option.textContent = u.role === 'supervisor' ? `(Sup) ${u.username}` : u.username;
-            select.appendChild(option);
-        });
-    }
+    // --- 4. EXPORTAR FUNCIONES AL ÁMBITO GLOBAL (WINDOW) ---
+    // Como usamos 'module', las funciones no son visibles en el HTML por defecto.
+    // Las "atajamos" al objeto window para que funcionen los onclick="window.funcion()"
 
-    function showRegisterModal(role) {
-        REGISTER_ROLE = role;
-        document.getElementById('modalTitle').innerText = role === 'supervisor' ? "Registrar SUPERVISOR" : "Registrar TÉCNICO";
-        document.getElementById('newUserName').value = '';
-        document.getElementById('newUserPass1').value = '';
-        document.getElementById('newUserPass2').value = '';
-        document.getElementById('registerModal').showModal();
-    }
+    window.toggleSupervisorLogin = () => {
+        const p = prompt("Acceso Supervisor: ¿Desea gestionar usuarios? (Si/No)");
+    };
 
-    function completeRegistration() {
-        const name = document.getElementById('newUserName').value.trim();
-        const p1 = document.getElementById('newUserPass1').value;
-        const p2 = document.getElementById('newUserPass2').value;
-        
-        if(!name || p1 !== p2) return alert("Error en datos");
-        const secureRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-        if (!secureRegex.test(p1)) return alert("Clave insegura: Requiere Mayúscula, Minúscula, Número y 6 caracteres.");
-
-        let users = JSON.parse(localStorage.getItem('appUsers')) || [];
-        if(users.find(u => u.username === name)) return alert("Usuario ya existe");
-        
-        users.push({ username: name, password: p1, role: REGISTER_ROLE });
-        localStorage.setItem('appUsers', JSON.stringify(users));
-        
-        alert("Registrado");
-        document.getElementById('registerModal').close();
-        if(REGISTER_ROLE === 'supervisor' && users.length === 1) location.reload();
-        else { loadUserDropdown(); renderAdminList(); }
-    }
-
-    function attemptLogin() {
-        const user = document.getElementById('loginUserSelect').value;
-        const pass = document.getElementById('loginPass').value;
-        const users = JSON.parse(localStorage.getItem('appUsers')) || [];
-        const found = users.find(u => u.username === user && u.password === pass);
-        
-        if (found) {
-            CURRENT_USER = found;
-            IS_DEMO = false;
-            enterApp();
-        } else alert("Credenciales incorrectas");
-    }
-
-    function startDemoMode() {
-        if(confirm("MODO DEMO: Los datos no se guardarán.")) {
-            CURRENT_USER = { username: "PRACTICANTE", role: 'demo' };
-            IS_DEMO = true;
-            document.body.classList.add('demo-mode');
-            enterApp();
-        }
-    }
-
-    function enterApp() {
-        document.getElementById('login-screen').classList.remove('active-screen');
-        document.getElementById('app-screen').classList.add('active-screen');
-        document.getElementById('displayUser').innerText = CURRENT_USER.username;
-        
-        if(CURRENT_USER.role === 'supervisor') {
-            document.getElementById('admin-btn').style.display = 'inline-block';
-            renderAdminList();
-        }
-        
-        loadPatients();
-        loadDoctors();
-        applyFilters(); 
-    }
-
-    function logout() {
-        location.reload();
-    }
-
-    // --- LOGICA CLINICA ---
-    function updateTime() {
-        const now = new Date();
-        if(document.getElementById('actionTimeInfo')) 
-            document.getElementById('actionTimeInfo').value = now.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-    }
-
-    function toggleActionFields() {
+    window.toggleActionFields = () => {
         const action = document.getElementById('actionType').value;
         const container = document.getElementById('doctorField');
         if (action === 'Aviso Médico' || action === 'Código Rojo') {
@@ -383,44 +261,219 @@
         } else {
             container.style.display = 'none';
         }
-    }
+    };
 
-    function loadDoctors() {
-        if(IS_DEMO) return;
-        const list = document.getElementById('doctorList');
-        list.innerHTML = '';
-        const docs = JSON.parse(localStorage.getItem('savedDoctors')) || [];
-        docs.forEach(doc => {
-            const op = document.createElement('option');
-            op.value = doc;
-            list.appendChild(op);
+    window.showRegisterModal = (role) => {
+        REGISTER_ROLE = role;
+        document.getElementById('modalTitle').innerText = role === 'supervisor' ? "Registrar SUPERVISOR" : "Registrar TÉCNICO";
+        document.getElementById('registerModal').showModal();
+    };
+
+    window.completeRegistration = () => {
+        const name = document.getElementById('newUserName').value.trim();
+        const p1 = document.getElementById('newUserPass1').value;
+        const p2 = document.getElementById('newUserPass2').value;
+        
+        if(!name || p1 !== p2) return alert("Error: Datos vacíos o claves no coinciden");
+        const secureRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+        if (!secureRegex.test(p1)) return alert("Clave insegura: Requiere Mayúscula, Minúscula, Número y 6 caracteres.");
+
+        // Guardar en Firebase (Users)
+        const newUser = { username: name, password: p1, role: REGISTER_ROLE };
+        
+        // Ver si existe (Lectura rápida)
+        get(child(ref(db), `users/${name}`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                alert("Usuario ya existe");
+            } else {
+                set(ref(db, 'users/' + name), newUser)
+                    .then(() => {
+                        alert("Usuario registrado en Nube.");
+                        document.getElementById('registerModal').close();
+                        if(REGISTER_ROLE === 'supervisor') location.reload();
+                    })
+                    .catch((err) => alert("Error escritura: " + err));
+            }
+        });
+    };
+
+    window.toggleAdminPanel = () => {
+        const p = document.getElementById('adminPanel');
+        p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    };
+
+    window.applyFilters = () => {
+        // Filtrar sobre LOCAL_RECORDS_CACHE (que se mantiene actualizado con onValue)
+        const nameFilter = document.getElementById('searchName').value.toLowerCase();
+        const dateFilter = document.getElementById('searchDate').value;
+        const timeStart = document.getElementById('searchTimeStart').value;
+        const timeEnd = document.getElementById('searchTimeEnd').value;
+
+        const filtered = LOCAL_RECORDS_CACHE.filter(rec => {
+            const matchName = rec.patient.toLowerCase().includes(nameFilter);
+            let matchDate = (!dateFilter || !rec.dateISO) ? true : rec.dateISO === dateFilter;
+            let matchTime = (!timeStart || !timeEnd || !rec.timeISO) ? true : (rec.timeISO >= timeStart && rec.timeISO <= timeEnd);
+            return matchName && matchDate && matchTime;
+        });
+        renderTable(filtered);
+    };
+
+    window.clearFilters = () => {
+        document.getElementById('searchName').value = "";
+        document.getElementById('searchDate').value = "";
+        document.getElementById('searchTimeStart').value = "";
+        document.getElementById('searchTimeEnd').value = "";
+        window.applyFilters(); // Recargar todo
+    };
+
+    window.generatePDF = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        // Obtener datos visibles de la tabla actual
+        const rows = document.querySelectorAll('#dataTable tbody tr');
+        if(rows.length === 0) return alert("No hay datos visibles");
+
+        const data = [];
+        rows.forEach(row => {
+            const cols = row.querySelectorAll('td');
+            data.push([cols[0].innerText, cols[1].innerText, cols[2].innerText, cols[3].innerText, cols[4].innerText, cols[5].innerText]);
+        });
+
+        doc.text("Reporte Telemetría Online", 14, 20);
+        doc.setFontSize(10);
+        doc.text(`Generado por: ${CURRENT_USER.username} (${IS_DEMO?'DEMO':'RED'})`, 14, 28);
+
+        doc.autoTable({
+            head: [['Hora', 'Técnico', 'Paciente', 'FC', 'Ritmo', 'Acción']],
+            body: data,
+            startY: 35,
+            theme: 'grid'
+        });
+        doc.save(`Telemetria_${new Date().getTime()}.pdf`);
+    };
+
+    // --- 5. LOGICA PRINCIPAL (Listeners) ---
+
+    // Listener para cargar Usuarios en el Login (Tiempo Real)
+    if(db) {
+        onValue(ref(db, 'users'), (snapshot) => {
+            const users = snapshot.val();
+            const select = document.getElementById('loginUserSelect');
+            const adminList = document.getElementById('userListDisplay');
+            
+            select.innerHTML = '<option value="">Seleccione...</option>';
+            if(adminList) adminList.innerHTML = '';
+            
+            let hasSupervisor = false;
+
+            if(users) {
+                Object.values(users).forEach(u => {
+                    if(u.role === 'supervisor') hasSupervisor = true;
+                    // Llenar select login
+                    let op = document.createElement('option');
+                    op.value = u.username;
+                    op.textContent = u.username;
+                    select.appendChild(op);
+
+                    // Llenar lista admin
+                    if(adminList) {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<span>${u.username} (${u.role})</span> <button style="color:red" onclick="window.deleteUserFirebase('${u.username}')">X</button>`;
+                        adminList.appendChild(li);
+                    }
+                });
+            }
+
+            if(!hasSupervisor) {
+                document.getElementById('login-form-box').style.display = 'none';
+                document.getElementById('supervisor-setup').style.display = 'block';
+            } else {
+                document.getElementById('login-form-box').style.display = 'block';
+                document.getElementById('supervisor-setup').style.display = 'none';
+            }
         });
     }
 
-    function saveDoctor(name) {
-        if(!name || IS_DEMO || name === "EMERGENCIA") return;
-        let docs = JSON.parse(localStorage.getItem('savedDoctors')) || [];
-        if(!docs.includes(name)) {
-            docs.push(name);
-            docs.sort();
-            localStorage.setItem('savedDoctors', JSON.stringify(docs));
-            loadDoctors();
-        }
-    }
+    // Funciones de Login
+    document.getElementById('btnLogin').addEventListener('click', () => {
+        const user = document.getElementById('loginUserSelect').value;
+        const pass = document.getElementById('loginPass').value;
+        if(!db) return alert("Error conexión DB");
 
-    // --- GESTIÓN PACIENTES ---
-    document.getElementById('patientName').addEventListener('input', function() {
-        if(IS_DEMO) return;
-        const val = this.value;
-        const db = JSON.parse(localStorage.getItem('savedPatients')) || {};
-        if(db[val]) {
-            document.getElementById('roomNumber').value = db[val].room;
-            document.getElementById('diagnosis').value = db[val].diagnosis;
+        get(child(ref(db), `users/${user}`)).then((snapshot) => {
+            if (snapshot.exists() && snapshot.val().password === pass) {
+                CURRENT_USER = snapshot.val();
+                IS_DEMO = false;
+                enterApp();
+            } else {
+                alert("Credenciales incorrectas");
+            }
+        });
+    });
+
+    document.getElementById('btnDemo').addEventListener('click', () => {
+        if(confirm("Entrar en modo DEMO (Offline/Local)?")) {
+            CURRENT_USER = { username: "DEMO_USER", role: 'demo' };
+            IS_DEMO = true;
+            document.body.classList.add('demo-mode');
+            enterApp();
         }
     });
 
-    // --- GUARDADO ---
-    document.getElementById('mainForm').addEventListener('submit', function(e) {
+    function enterApp() {
+        document.getElementById('login-screen').classList.remove('active-screen');
+        document.getElementById('app-screen').classList.add('active-screen');
+        document.getElementById('displayUser').innerText = CURRENT_USER.username;
+        if(CURRENT_USER.role === 'supervisor') document.getElementById('admin-btn').style.display = 'inline-block';
+        
+        loadDataListeners(); // Activar escucha de registros
+    }
+
+    // Escuchar Registros, Pacientes y Médicos
+    function loadDataListeners() {
+        if(IS_DEMO) {
+            // Cargar de sessionStorage si es demo
+            LOCAL_RECORDS_CACHE = JSON.parse(sessionStorage.getItem('demoRecords')) || [];
+            window.applyFilters();
+            return;
+        }
+
+        // 1. REGISTROS (Tabla)
+        onValue(ref(db, 'records'), (snapshot) => {
+            const data = snapshot.val();
+            LOCAL_RECORDS_CACHE = data ? Object.values(data) : [];
+            window.applyFilters(); // Actualizar tabla
+        });
+
+        // 2. PACIENTES (Datalist)
+        onValue(ref(db, 'patients'), (snapshot) => {
+            const list = document.getElementById('patientList');
+            list.innerHTML = '';
+            if(snapshot.exists()) {
+                Object.keys(snapshot.val()).forEach(key => {
+                    const op = document.createElement('option');
+                    op.value = key;
+                    list.appendChild(op);
+                });
+            }
+        });
+        
+        // 3. MEDICOS (Datalist)
+        onValue(ref(db, 'doctors'), (snapshot) => {
+            const list = document.getElementById('doctorList');
+            list.innerHTML = '';
+            if(snapshot.exists()) {
+                Object.keys(snapshot.val()).forEach(key => {
+                    const op = document.createElement('option');
+                    op.value = key;
+                    list.appendChild(op);
+                });
+            }
+        });
+    }
+
+    // --- GUARDADO DE DATOS ---
+    document.getElementById('mainForm').addEventListener('submit', (e) => {
         e.preventDefault();
         
         const patient = document.getElementById('patientName').value;
@@ -429,188 +482,88 @@
         const rhythm = document.getElementById('rhythm').value;
         const diag = document.getElementById('diagnosis').value;
         const actionType = document.getElementById('actionType').value;
-        const doctorName = document.getElementById('doctorName').value;
+        const docName = document.getElementById('doctorName').value;
         
-        let actionDetail = actionType;
         const now = new Date();
         const timeISO = now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+        let actionDetail = actionType;
         
-        if (actionType === 'Aviso Médico') {
-            actionDetail = `Aviso: ${doctorName} (${timeISO})`;
-            saveDoctor(doctorName);
-        }
+        if (actionType === 'Aviso Médico') actionDetail = `Aviso: ${docName} (${timeISO})`;
         if (actionType === 'Código Rojo') actionDetail = `🚨 CÓDIGO ROJO (${timeISO})`;
 
-        const fullTime = `${now.toLocaleDateString()} ${timeISO}`;
-        
         const record = {
             id: Date.now(),
-            dateISO: now.toISOString().split('T')[0], // YYYY-MM-DD
-            timeISO: timeISO, 
-            visibleTime: fullTime,
+            dateISO: now.toISOString().split('T')[0],
+            timeISO: timeISO,
+            visibleTime: `${now.toLocaleDateString()} ${timeISO}`,
             tech: CURRENT_USER.username,
             patient, room, fc, rhythm, diag, actionDetail
         };
 
-        saveRecord(record);
+        if(IS_DEMO) {
+            LOCAL_RECORDS_CACHE.push(record);
+            sessionStorage.setItem('demoRecords', JSON.stringify(LOCAL_RECORDS_CACHE));
+            window.applyFilters();
+        } else {
+            // Enviar a Firebase
+            push(ref(db, 'records'), record);
+            
+            // Actualizar DB de Pacientes (Guardar ultimo estado)
+            set(ref(db, 'patients/' + patient), { room, diagnosis: diag });
+            
+            // Actualizar DB de Medicos
+            if(docName && actionType === 'Aviso Médico') {
+               set(ref(db, 'doctors/' + docName), true); 
+            }
+        }
         
-        // Limpiar
+        // Reset parcial form
         document.getElementById('rhythm').value = "";
         document.getElementById('heartRate').value = "";
         document.getElementById('actionType').value = "Sin Acción";
-        toggleActionFields();
+        window.toggleActionFields();
     });
 
-    function saveRecord(record) {
-        const storage = IS_DEMO ? sessionStorage : localStorage;
-        let records = JSON.parse(storage.getItem('clinicalRecords')) || [];
-        records.push(record);
-        storage.setItem('clinicalRecords', JSON.stringify(records));
-        
-        if(!IS_DEMO) {
-            let db = JSON.parse(localStorage.getItem('savedPatients')) || {};
-            db[record.patient] = { room: record.room, diagnosis: record.diag };
-            localStorage.setItem('savedPatients', JSON.stringify(db));
-            loadPatients();
-        }
-        applyFilters();
-    }
-
-    // --- FILTROS Y TABLA ---
-    function applyFilters() {
-        const storage = IS_DEMO ? sessionStorage : localStorage;
-        const allRecords = JSON.parse(storage.getItem('clinicalRecords')) || [];
-        
-        const nameFilter = document.getElementById('searchName').value.toLowerCase();
-        const dateFilter = document.getElementById('searchDate').value; // YYYY-MM-DD
-        const timeStart = document.getElementById('searchTimeStart').value;
-        const timeEnd = document.getElementById('searchTimeEnd').value;
-
-        const filtered = allRecords.filter(rec => {
-            const matchName = rec.patient.toLowerCase().includes(nameFilter);
-            
-            let matchDate = true;
-            if(dateFilter && rec.dateISO) {
-                matchDate = rec.dateISO === dateFilter;
+    // Helper: Llenar datos paciente al escribir
+    document.getElementById('patientName').addEventListener('change', function() {
+        if(IS_DEMO) return;
+        get(child(ref(db), `patients/${this.value}`)).then((snapshot) => {
+            if(snapshot.exists()) {
+                document.getElementById('roomNumber').value = snapshot.val().room;
+                document.getElementById('diagnosis').value = snapshot.val().diagnosis;
             }
-
-            let matchTime = true;
-            if(timeStart && timeEnd && rec.timeISO) {
-                matchTime = rec.timeISO >= timeStart && rec.timeISO <= timeEnd;
-            }
-
-            return matchName && matchDate && matchTime;
         });
+    });
 
-        renderTable(filtered);
-    }
+    // Helper: Eliminar usuario (admin)
+    window.deleteUserFirebase = (name) => {
+        if(confirm("Eliminar usuario?")) {
+            remove(ref(db, 'users/' + name));
+        }
+    };
 
-    function clearFilters() {
-        document.getElementById('searchName').value = "";
-        document.getElementById('searchDate').value = "";
-        document.getElementById('searchTimeStart').value = "";
-        document.getElementById('searchTimeEnd').value = "";
-        applyFilters();
-    }
-
+    // Helper: Render Tabla
     function renderTable(records) {
         const tbody = document.querySelector('#dataTable tbody');
         tbody.innerHTML = '';
-
         [...records].reverse().forEach(rec => {
             const tr = document.createElement('tr');
             let style = "badge bg-ok";
             if(rec.rhythm.includes("Fibrilación") || rec.rhythm.includes("Aleteo")) style = "badge bg-warn";
             if(rec.rhythm.includes("Asistolia") || rec.rhythm.includes("Código")) style = "badge bg-alert";
 
-            tr.innerHTML = `
-                <td>${rec.visibleTime || rec.timestamp}</td>
-                <td>${rec.tech}</td>
-                <td><strong>${rec.patient}</strong> <small>(${rec.room})</small></td>
-                <td><b>${rec.fc}</b></td>
-                <td><span class="${style}">${rec.rhythm}</span></td>
-                <td>${rec.actionDetail}</td>
-            `;
+            tr.innerHTML = `<td>${rec.visibleTime}</td><td>${rec.tech}</td><td><strong>${rec.patient}</strong> (${rec.room})</td><td>${rec.fc}</td><td><span class="${style}">${rec.rhythm}</span></td><td>${rec.actionDetail}</td>`;
             tbody.appendChild(tr);
         });
     }
 
-    function loadPatients() {
-        if(IS_DEMO) return;
-        const list = document.getElementById('patientList');
-        list.innerHTML = '';
-        const db = JSON.parse(localStorage.getItem('savedPatients')) || {};
-        Object.keys(db).forEach(name => {
-            const op = document.createElement('option');
-            op.value = name;
-            list.appendChild(op);
-        });
-    }
+    // Reloj
+    setInterval(() => {
+        const now = new Date();
+        const t = document.getElementById('actionTimeInfo');
+        if(t) t.value = now.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+    }, 1000);
 
-    // --- PDF ---
-    async function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        // REPLICAR FILTRO PARA PDF
-        const storage = IS_DEMO ? sessionStorage : localStorage;
-        const allRecords = JSON.parse(storage.getItem('clinicalRecords')) || [];
-        
-        const nameFilter = document.getElementById('searchName').value.toLowerCase();
-        const dateFilter = document.getElementById('searchDate').value;
-        const timeStart = document.getElementById('searchTimeStart').value;
-        const timeEnd = document.getElementById('searchTimeEnd').value;
-
-        const recordsToPrint = allRecords.filter(rec => {
-            let matchName = rec.patient.toLowerCase().includes(nameFilter);
-            let matchDate = (!dateFilter || !rec.dateISO) ? true : rec.dateISO === dateFilter;
-            let matchTime = (!timeStart || !timeEnd || !rec.timeISO) ? true : (rec.timeISO >= timeStart && rec.timeISO <= timeEnd);
-            return matchName && matchDate && matchTime;
-        });
-
-        if(recordsToPrint.length === 0) return alert("Nada visible para imprimir");
-
-        doc.text("Reporte Telemetría Cardiología", 14, 20);
-        doc.setFontSize(10);
-        doc.text(`Generado por: ${CURRENT_USER.username} | Fecha: ${new Date().toLocaleDateString()}`, 14, 28);
-        
-        if(dateFilter) doc.text(`* Filtro Fecha: ${dateFilter}`, 14, 34);
-
-        const data = recordsToPrint.map(r => [r.visibleTime || r.timestamp, r.tech, r.patient, r.fc, r.rhythm, r.actionDetail]);
-
-        doc.autoTable({
-            head: [['Fecha/Hora', 'Técnico', 'Paciente', 'FC', 'Ritmo', 'Acción']],
-            body: data,
-            startY: 40,
-            theme: 'grid'
-        });
-
-        doc.save(`Telemetria_${IS_DEMO?'DEMO':'Oficial'}.pdf`);
-    }
-
-    // --- ADMIN UTIL ---
-    function toggleAdminPanel() {
-        const p = document.getElementById('adminPanel');
-        p.style.display = p.style.display === 'none' ? 'block' : 'none';
-    }
-    function renderAdminList() {
-        const l = document.getElementById('userListDisplay');
-        l.innerHTML = '';
-        const u = JSON.parse(localStorage.getItem('appUsers')) || [];
-        u.forEach(user => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${user.username} (${user.role})</span> <button onclick="delUser('${user.username}')" style="background:red;color:white;font-size:0.7em">X</button>`;
-            l.appendChild(li);
-        });
-    }
-    function delUser(name) {
-        if(confirm("¿Eliminar usuario?")) {
-            let u = JSON.parse(localStorage.getItem('appUsers')) || [];
-            u = u.filter(x => x.username !== name);
-            localStorage.setItem('appUsers', JSON.stringify(u));
-            renderAdminList();
-        }
-    }
 </script>
 </body>
 </html>
